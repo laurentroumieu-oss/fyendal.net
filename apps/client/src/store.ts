@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type {
   BotOpponent,
+  BotDifficulty,
   ClientMessage,
   EmoteMessage,
   HeroId,
@@ -113,7 +114,7 @@ export const useStore = create<StoreState>((set, get) => {
   let joiningRoomCode: string | null = null;
   /** A bot-room request waiting for the retained matchmaking room to release
    *  this socket. WebSocket commands stay ordered by waiting for `left`. */
-  let pendingBotRoom: { format: ConstructedFormat; deckId: string; bot?: BotOpponent } | null = null;
+  let pendingBotRoom: { format: ConstructedFormat; deckId: string; bot?: BotOpponent; difficulty?: BotDifficulty } | null = null;
   /** Choice associated with the current/most recent matchmaking request. */
   let activeMatchmakingChoiceKey: string | null = null;
   /** In-memory monotonic race fences for callbacks that outlive the
@@ -508,7 +509,7 @@ export const useStore = create<StoreState>((set, get) => {
     replayRuntime.discard(get().roomCode);
     resetRoomVersionState();
     set(clearedRoomProjection());
-    get().createBotRoom(pending.format, pending.deckId, pending.bot);
+    get().createBotRoom(pending.format, pending.deckId, pending.bot, pending.difficulty);
   }
 
   function syncCompletedReplay(code: string): Promise<ReplayFile | null> {
@@ -965,7 +966,7 @@ export const useStore = create<StoreState>((set, get) => {
         });
       });
     },
-    createBotRoom: (format, deckId, bot) => {
+    createBotRoom: (format, deckId, bot, difficulty) => {
       roomEntryPending = false;
       rememberPlayedDeck(format, deckId);
       prepDeckId = deckId;
@@ -977,13 +978,14 @@ export const useStore = create<StoreState>((set, get) => {
           format,
           deckId,
           ...(bot ? { bot } : {}),
+          ...(difficulty ? { difficulty } : {}),
           ...(get().allowFutureCards[format] ? { allowFutureCards: true } : {}),
         });
       });
     },
-    playBotFromPrep: (format, deckId, bot) => {
+    playBotFromPrep: (format, deckId, bot, difficulty) => {
       if (pendingBotRoom || !get().matchmakingActive) return;
-      pendingBotRoom = { format, deckId, ...(bot ? { bot } : {}) };
+      pendingBotRoom = { format, deckId, ...(bot ? { bot } : {}), ...(difficulty ? { difficulty } : {}) };
       if (get().roomCode) {
         send({ type: "leave-room" });
       } else if (get().queuedFormat) {

@@ -5,7 +5,7 @@ import {
   type TurnPlannerCandidateTrace,
 } from "@fyendal/bot";
 import { isGameIntent } from "@fyendal/protocol";
-import type { BotOpponent } from "@fyendal/shared";
+import type { BotDifficulty, BotOpponent } from "@fyendal/shared";
 import type { PersistedStateV1 } from "./persistedState.js";
 
 const TASK_KEYS = [
@@ -33,6 +33,7 @@ export interface BotPolicyTask {
   version: number;
   rulesetVersion: string;
   botId: BotOpponent;
+  difficulty?: BotDifficulty;
   seat: 0 | 1;
   state: PersistedStateV1;
 }
@@ -62,8 +63,9 @@ function record(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
-function exact(value: Record<string, unknown>, keys: readonly string[]): boolean {
+function exact(value: Record<string, unknown>, keys: readonly string[], optionalKeys: readonly string[] = []): boolean {
   const allowed = new Set(keys);
+  for (const key of optionalKeys) allowed.add(key);
   return Object.keys(value).every((key) => allowed.has(key)) &&
     keys.every((key) => Object.hasOwn(value, key));
 }
@@ -142,7 +144,7 @@ function decodeDecision(value: unknown): BotDecision | null {
 
 export function decodeBotPolicyTask(value: unknown): DecodedBotPolicyTask | null {
   const candidate = record(value);
-  if (!candidate || !exact(candidate, TASK_KEYS)) return null;
+  if (!candidate || !exact(candidate, TASK_KEYS, ["difficulty"])) return null;
   if (!safeInteger(candidate.taskId) || !safeInteger(candidate.version)) return null;
   if (typeof candidate.code !== "string" || !/^[A-Z0-9]{6}$/.test(candidate.code)) return null;
   if (typeof candidate.rulesetVersion !== "string" || candidate.rulesetVersion.length === 0 ||
@@ -151,6 +153,9 @@ export function decodeBotPolicyTask(value: unknown): DecodedBotPolicyTask | null
     ? botDefinition(candidate.botId)
     : undefined;
   if (!definition) return null;
+  if (candidate.difficulty !== undefined &&
+    !(candidate.difficulty === "training" || candidate.difficulty === "balanced" ||
+      candidate.difficulty === "tactical" || candidate.difficulty === "champion")) return null;
   if (!(candidate.seat === 0 || candidate.seat === 1)) return null;
   if (!record(candidate.state)) return null;
   return {
@@ -159,6 +164,7 @@ export function decodeBotPolicyTask(value: unknown): DecodedBotPolicyTask | null
     version: candidate.version,
     rulesetVersion: candidate.rulesetVersion,
     botId: definition.id,
+    ...(candidate.difficulty !== undefined ? { difficulty: candidate.difficulty } : {}),
     seat: candidate.seat,
     state: candidate.state,
   };

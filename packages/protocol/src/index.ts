@@ -510,10 +510,11 @@ export function decodeClientMessage(value: unknown): ClientMessage | null {
         ));
       break;
     case "create-bot-room":
-      valid = exactKeys(message, ["type", "format", "deckId", "bot", "allowFutureCards"], ["type", "deckId"])
+      valid = exactKeys(message, ["type", "format", "deckId", "bot", "difficulty", "allowFutureCards"], ["type", "deckId"])
         && (message.format === undefined || message.format === "cc" || message.format === "silver-age")
         && id(message.deckId)
         && (message.bot === undefined || BOT_OPPONENTS.has(String(message.bot)))
+        && (message.difficulty === undefined || ["training", "balanced", "tactical", "champion"].includes(String(message.difficulty)))
         && (message.allowFutureCards === undefined || typeof message.allowFutureCards === "boolean");
       break;
     case "join-room":

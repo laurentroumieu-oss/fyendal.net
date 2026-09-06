@@ -427,6 +427,11 @@ export const MIGRATIONS: Migration[] = [
     CREATE INDEX bug_reports_reporter_notification_idx
       ON bug_reports (reporter_user_id, dismissed_at, fixed_at);`,
   },
+  {
+    version: 25,
+    sql: `ALTER TABLE room_seats ADD COLUMN bot_difficulty TEXT NOT NULL DEFAULT 'balanced'
+      CHECK (bot_difficulty IN ('training', 'balanced', 'tactical', 'champion'));`,
+  },
 ];
 
 async function publicTables(db: Queryable): Promise<string[]> {

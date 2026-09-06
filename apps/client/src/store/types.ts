@@ -1,5 +1,6 @@
 import type {
   BotOpponent,
+  BotDifficulty,
   Format,
   GameIntent,
   GameTransitionView,
@@ -147,8 +148,8 @@ export interface StoreState {
     choice: { hero?: HeroId; deckId?: string },
     visibility?: "private" | "public",
   ) => void;
-  createBotRoom: (format: ConstructedFormat, deckId: string, bot?: BotOpponent) => void;
-  playBotFromPrep: (format: ConstructedFormat, deckId: string, bot?: BotOpponent) => void;
+  createBotRoom: (format: ConstructedFormat, deckId: string, bot?: BotOpponent, difficulty?: BotDifficulty) => void;
+  playBotFromPrep: (format: ConstructedFormat, deckId: string, bot?: BotOpponent, difficulty?: BotDifficulty) => void;
   joinRoom: (code: string, deckId?: string, spectate?: boolean, hero?: HeroId) => void;
   inspectRoom: (code: string) => void;
   dismissInvite: (resetUrl?: boolean) => void;

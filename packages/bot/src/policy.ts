@@ -1,5 +1,6 @@
 import type { CardData, CardView, GameIntent, GameView } from "@fyendal/shared";
 import type { GameState } from "@fyendal/engine";
+import type { BotDifficultyId } from "./difficulty.js";
 import { requiredEquipmentStageIntent } from "./defense.js";
 import {
   evaluateOnHit,
@@ -18,6 +19,8 @@ export interface BotPolicyInput {
   /** Authoritative state is used only by bounded, projection-safe rollout
    * adapters. Ordinary policy scoring must continue to read `view`. */
   state?: GameState;
+  /** Player-selected computation profile. Omitted means Balanced. */
+  difficulty?: BotDifficultyId;
 }
 
 export type DefendIntent = Extract<GameIntent, { kind: "defend" }>;

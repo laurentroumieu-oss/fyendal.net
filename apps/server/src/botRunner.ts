@@ -314,6 +314,7 @@ export class BotRunner {
       legal: message.legal,
       cards: cardData,
       state: room.state,
+      difficulty: room.seats[seat]?.botDifficulty,
     };
     const now = this.deps.now ?? Date.now;
     const startedAt = now();
@@ -335,6 +336,7 @@ export class BotRunner {
             version: room.version,
             rulesetVersion: room.rulesetVersion,
             botId: definition.id,
+            difficulty: room.seats[seat]?.botDifficulty,
             seat,
             state: dehydrateState(room.state, room.rulesetVersion),
           });

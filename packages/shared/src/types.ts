@@ -10,6 +10,10 @@ export type Format = "classic-battles" | "cc" | "silver-age";
 /** Stable identities for the supported practice opponents. */
 export type BotOpponent = "bravo" | "briar" | "cindra" | "ira" | "hala" | "jarl";
 
+/** Player-facing bot computation profile. It changes bounded search/variation,
+ * never card stats, rules, or legal-intent validation. */
+export type BotDifficulty = "training" | "balanced" | "tactical" | "champion";
+
 /** Numeric resources produced when pitched. Colored cards use their red/
  * yellow/blue/purple color value (1/2/3/4). */
 export type Pitch = 1 | 2 | 3 | 4;
@@ -748,7 +752,7 @@ export type ClientMessage =
   /** classic-battles: hero; cc/silver-age: deckId of a saved deck */
   | { type: "create-room"; format: Format; hero?: HeroId; deckId?: string; private?: boolean; allowFutureCards?: boolean }
   /** Create a dedicated constructed room with the selected AI opponent. */
-  | { type: "create-bot-room"; format?: "cc" | "silver-age"; deckId: string; bot?: BotOpponent; allowFutureCards?: boolean }
+  | { type: "create-bot-room"; format?: "cc" | "silver-age"; deckId: string; bot?: BotOpponent; difficulty?: BotDifficulty; allowFutureCards?: boolean }
   /** deckId required to take a player seat in cc/silver-age rooms; omit to spectate.
    *  classic-battles player seats pass hero (mirrors allowed; omitted = the
    *  opposite of the seated player). spectate forces a spectator slot even

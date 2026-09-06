@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useShallow } from "zustand/react/shallow";
 import type { DeckSummary } from "@fyendal/protocol";
-import type { BotOpponent } from "@fyendal/shared";
+import type { BotDifficulty, BotOpponent } from "@fyendal/shared";
 import type { ConstructedFormat } from "../domain.js";
 import { useStore } from "../store.js";
 import { deckChoicesFor, deckIsLegalForRoom } from "./DeckGrid.js";
@@ -50,9 +50,9 @@ export function CreateRoomModal({ onClose }: { onClose: () => void }) {
     onClose();
   };
 
-  const playBot = (bot: BotOpponent) => {
+  const playBot = (bot: BotOpponent, difficulty: BotDifficulty) => {
     if (!selectionValid) return;
-    createBotRoom(format, deckId, bot);
+    createBotRoom(format, deckId, bot, difficulty);
     onClose();
   };
 
@@ -131,7 +131,7 @@ export function CreateRoomModal({ onClose }: { onClose: () => void }) {
         {choosingBot ? (
           <BotOpponentModal
             format={format}
-            onSelect={(bot) => playBot(bot)}
+            onSelect={(bot, difficulty) => playBot(bot, difficulty)}
             onClose={() => setChoosingBot(false)}
           />
         ) : null}

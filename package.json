@@ -10,6 +10,8 @@
     "check:card-images": "node scripts/check-card-images.mjs",
     "check:rules-limitations": "node scripts/check-rules-limitations.mjs",
     "audit:card-pool": "node scripts/audit-card-pool.mjs",
+    "benchmark:bot": "pnpm --filter @fyendal/server exec tsx ../../scripts/bot-scenario-benchmark.ts",
+    "benchmark:difficulty": "pnpm --filter @fyendal/server exec tsx ../../scripts/bot-difficulty-benchmark.ts",
     "sync:card-pool": "node scripts/sync-card-pool.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

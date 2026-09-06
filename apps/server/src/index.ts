@@ -484,7 +484,7 @@ export function createGameServer(port: number, deps: ServerDeps): http.Server {
           deckName: choice.choice.deckName,
           username: ctx.user.username,
           userId: ctx.user.id,
-        }, msg.allowFutureCards === true, botOpponent);
+        }, msg.allowFutureCards === true, botOpponent, msg.difficulty ?? "balanced");
         connections.attach(ctx, code, seat, token);
         const version = await markAttachedPresent(ctx);
         send(ws, { type: "room-created", code, seat, token, version });

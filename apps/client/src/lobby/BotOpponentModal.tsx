@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useIntl } from "react-intl";
-import type { BotOpponent } from "@fyendal/shared";
+import type { BotDifficulty, BotOpponent } from "@fyendal/shared";
 import type { ConstructedFormat } from "../domain.js";
 import { heroImageUrl } from "./heroImage.js";
 
@@ -72,11 +72,18 @@ const BOTS: Readonly<Record<ConstructedFormat, readonly BotOption[]>> = {
 
 export function BotOpponentModal(props: {
   format: ConstructedFormat;
-  onSelect: (bot: BotOpponent) => void;
+  onSelect: (bot: BotOpponent, difficulty: BotDifficulty) => void;
   onClose: () => void;
 }) {
   const intl = useIntl();
   const bots = BOTS[props.format];
+  const [difficulty, setDifficulty] = useState<BotDifficulty>("balanced");
+  const levels: readonly [BotDifficulty, string][] = [
+    ["training", "Training"],
+    ["balanced", "Balanced"],
+    ["tactical", "Tactical"],
+    ["champion", "Champion"],
+  ];
   return (
     <div
       className="modal-backdrop bot-opponent-backdrop"
@@ -97,13 +104,27 @@ export function BotOpponentModal(props: {
           {intl.formatMessage({ id: "lobby.bot.chooseOpponent" })}
         </h2>
         <p className="muted">{intl.formatMessage({ id: "lobby.bot.prompt" })}</p>
+        <fieldset className="bot-difficulty-picker">
+          <legend>Decision strength</legend>
+          {levels.map(([id, label]) => (
+            <button
+              type="button"
+              key={id}
+              className={difficulty === id ? "selected" : ""}
+              aria-pressed={difficulty === id}
+              onClick={() => setDifficulty(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </fieldset>
         <div className="bot-opponent-options">
           {bots.map((bot, index) => (
             <button
               type="button"
               key={bot.id}
               autoFocus={index === 0}
-              onClick={() => props.onSelect(bot.id)}
+              onClick={() => props.onSelect(bot.id, difficulty)}
             >
               <BotPortrait name={bot.name} heroName={bot.heroName} />
               <span className="bot-opponent-details">
