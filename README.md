@@ -58,6 +58,10 @@ ephemeral in-memory database instead:
 pnpm dev:memory
 ```
 
+In a second terminal, keep the client running with `pnpm --filter
+@fyendal/client dev` and open <http://localhost:5173>. The memory server listens
+on `ws://localhost:8080` and `http://localhost:8080` for the client API.
+
 This mode resets its data whenever the server restarts and is disabled when
 `NODE_ENV=production`; normal development and production continue to use
 PostgreSQL.

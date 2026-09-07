@@ -16,7 +16,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "dev": "pnpm --parallel --filter @fyendal/server --filter @fyendal/client dev",
-    "dev:memory": "FYENDAL_DEV_MEMORY_DB=1 pnpm dev",
+    "dev:memory": "pnpm --filter @fyendal/server dev:memory",
     "perf:up": "docker compose -f docker-compose.perf.yml up --build --wait -d",
     "perf:load": "pnpm --filter @fyendal/server exec node --import tsx ../../scripts/perf/load.mts",
     "perf:test": "pnpm --filter @fyendal/server exec node --import tsx --test ../../scripts/perf/*.test.mts",
