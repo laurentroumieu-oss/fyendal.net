@@ -14,7 +14,7 @@ import {
 import { chooseHalaIntent, chooseHalaIntentWithTrace } from "./hala-policy.js";
 import { chooseIraIntent, chooseIraIntentWithTrace } from "./ira-policy.js";
 import { chooseJarlIntent, chooseJarlIntentWithTrace } from "./jarl-policy.js";
-import { chooseGenericSilverAgeIntent } from "./generic-silver-age-policy.js";
+import { chooseIyslanderIntent, chooseKayoIntent } from "./generic-silver-age-policy.js";
 import type { BotPolicyInput } from "./policy.js";
 import type { TurnPlanCheckpoint, TurnPlannerCandidateTrace } from "./turn-planner.js";
 import {
@@ -111,8 +111,8 @@ export const BOT_DEFINITIONS = {
     deckId: "precon-ska",
     username: "Kayo Bot",
     deckName: "Kayo Precon",
-    chooseIntent: chooseGenericSilverAgeIntent,
-    chooseDecision: (input) => ({ intent: chooseGenericSilverAgeIntent(input) }),
+    chooseIntent: chooseKayoIntent,
+    chooseDecision: (input) => ({ intent: chooseKayoIntent(input) }),
     presentationFor: (opponent) => kayoPresentation(),
   },
   iyslander: {
@@ -121,8 +121,8 @@ export const BOT_DEFINITIONS = {
     deckId: "precon-siy",
     username: "Iyslander Bot",
     deckName: "Iyslander Precon",
-    chooseIntent: chooseGenericSilverAgeIntent,
-    chooseDecision: (input) => ({ intent: chooseGenericSilverAgeIntent(input) }),
+    chooseIntent: chooseIyslanderIntent,
+    chooseDecision: (input) => ({ intent: chooseIyslanderIntent(input) }),
     presentationFor: (opponent) => iyslanderPresentation(),
   },
   cindra: {

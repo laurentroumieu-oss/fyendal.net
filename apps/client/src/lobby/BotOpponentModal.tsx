@@ -70,7 +70,7 @@ const BOTS: Readonly<Record<ConstructedFormat, readonly BotOption[]>> = {
     {
       id: "kayo",
       name: "Kayo",
-      title: "Arakni's successor",
+      title: "Armed and Dangerous",
       heroName: "Kayo, Armed and Dangerous",
       deckType: "midrange",
       descriptionId: "lobby.bot.kayo.description",
@@ -78,7 +78,7 @@ const BOTS: Readonly<Record<ConstructedFormat, readonly BotOption[]>> = {
     {
       id: "iyslander",
       name: "Iyslander",
-      title: "Storm of Sand",
+      title: "Stormbind",
       heroName: "Iyslander",
       deckType: "elemental",
       descriptionId: "lobby.bot.iyslander.description",

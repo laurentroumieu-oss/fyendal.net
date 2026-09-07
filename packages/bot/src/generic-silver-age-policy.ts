@@ -22,6 +22,53 @@ function scoreCard(intent: GameIntent, input: BotPolicyInput): number {
   return data.defense ?? data.pitch ?? 0;
 }
 
+function scoreProfiledCard(
+  intent: GameIntent,
+  input: BotPolicyInput,
+  profile: "kayo" | "iyslander",
+): number {
+  const score = scoreCard(intent, input);
+  const card = cardFor(intent, input);
+  const data = card ? input.cards[card.cardId] : undefined;
+  if (!data) return score;
+  const name = data.name.toLowerCase();
+  const text = data.text.toLowerCase();
+
+  if (profile === "kayo") {
+    // Kayo alternates efficient two-card turns with explosive attack turns.
+    if (data.attack !== undefined) return score + (data.attack >= 6 ? 24 : 10);
+    if (
+      name.includes("clash of might") ||
+      name.includes("high pitched howl") ||
+      name.includes("rough up") ||
+      name.includes("wild ride") ||
+      name.includes("savage feast") ||
+      name.includes("sirens of safe harbor")
+    ) return score + 24;
+    if (name.includes("pulping") || name.includes("strongest survive")) return score + 18;
+    if (name.includes("agile windup") || name.includes("draw") || text.includes("discard")) {
+      return score + 10;
+    }
+    return score;
+  }
+
+  // Silver Age Iyslander is the Bullander plan: physical pressure on our
+  // turn, then Ice/Wizard disruption when the opponent owns priority.
+  if (
+    name === "wounded bull" ||
+    name === "fyendal's fighting spirit" ||
+    name === "look tuff"
+  ) {
+    return score + 28;
+  }
+  if (input.view.activePlayer !== input.seat &&
+      (text.includes("arcane damage") || text.includes("frostbite") || text.includes("ice"))) {
+    return score + 30;
+  }
+  if (text.includes("arcane damage") || text.includes("frostbite")) return score + 12;
+  return score;
+}
+
 function scoreDefense(
   intent: Extract<GameIntent, { kind: "defend" }>,
   input: BotPolicyInput,
@@ -34,10 +81,25 @@ function scoreDefense(
 }
 
 export function chooseGenericSilverAgeIntent(input: BotPolicyInput): GameIntent {
+  return chooseProfiledIntent(input, "kayo");
+}
+
+function chooseProfiledIntent(
+  input: BotPolicyInput,
+  profile: "kayo" | "iyslander",
+): GameIntent {
   return chooseScoredIntent(input, {
     defend: (intent, policyInput) => scoreDefense(intent, policyInput),
     choose: () => 0,
-    play: (intent, policyInput) => scoreCard(intent, policyInput),
+    play: (intent, policyInput) => scoreProfiledCard(intent, policyInput, profile),
     nextTurnArsenal: (card) => card.defense ?? 0,
   });
+}
+
+export function chooseKayoIntent(input: BotPolicyInput): GameIntent {
+  return chooseProfiledIntent(input, "kayo");
+}
+
+export function chooseIyslanderIntent(input: BotPolicyInput): GameIntent {
+  return chooseProfiledIntent(input, "iyslander");
 }
