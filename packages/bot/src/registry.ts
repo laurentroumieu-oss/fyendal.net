@@ -14,6 +14,7 @@ import {
 import { chooseHalaIntent, chooseHalaIntentWithTrace } from "./hala-policy.js";
 import { chooseIraIntent, chooseIraIntentWithTrace } from "./ira-policy.js";
 import { chooseJarlIntent, chooseJarlIntentWithTrace } from "./jarl-policy.js";
+import { chooseGenericSilverAgeIntent } from "./generic-silver-age-policy.js";
 import type { BotPolicyInput } from "./policy.js";
 import type { TurnPlanCheckpoint, TurnPlannerCandidateTrace } from "./turn-planner.js";
 import {
@@ -23,6 +24,8 @@ import {
   halaPresentationFor,
   iraPresentation,
   jarlPresentationFor,
+  kayoPresentation,
+  iyslanderPresentation,
 } from "./sideboard.js";
 
 export type ConstructedBotFormat = "cc" | "silver-age";
@@ -101,6 +104,26 @@ export const BOT_DEFINITIONS = {
     chooseIntent: chooseBriarIntent,
     chooseDecision: (input) => botDecisionFromTrace(chooseBriarIntentWithTrace(input)),
     presentationFor: (opponent, botTurnOrder) => briarPresentationFor(opponent, botTurnOrder),
+  },
+  kayo: {
+    id: "kayo",
+    format: "silver-age",
+    deckId: "precon-ska",
+    username: "Kayo Bot",
+    deckName: "Kayo Precon",
+    chooseIntent: chooseGenericSilverAgeIntent,
+    chooseDecision: (input) => ({ intent: chooseGenericSilverAgeIntent(input) }),
+    presentationFor: (opponent) => kayoPresentation(),
+  },
+  iyslander: {
+    id: "iyslander",
+    format: "silver-age",
+    deckId: "precon-siy",
+    username: "Iyslander Bot",
+    deckName: "Iyslander Precon",
+    chooseIntent: chooseGenericSilverAgeIntent,
+    chooseDecision: (input) => ({ intent: chooseGenericSilverAgeIntent(input) }),
+    presentationFor: (opponent) => iyslanderPresentation(),
   },
   cindra: {
     id: "cindra",

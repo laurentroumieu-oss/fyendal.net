@@ -8,7 +8,7 @@ export type HeroId = "dorinthea" | "rhinar";
 export type Format = "classic-battles" | "cc" | "silver-age";
 
 /** Stable identities for the supported practice opponents. */
-export type BotOpponent = "bravo" | "briar" | "cindra" | "ira" | "hala" | "jarl";
+export type BotOpponent = "bravo" | "briar" | "kayo" | "iyslander" | "cindra" | "ira" | "hala" | "jarl";
 
 /** Player-facing bot computation profile. It changes bounded search/variation,
  * never card stats, rules, or legal-intent validation. */

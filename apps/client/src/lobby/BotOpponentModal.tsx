@@ -67,6 +67,22 @@ const BOTS: Readonly<Record<ConstructedFormat, readonly BotOption[]>> = {
       deckType: "guardian",
       descriptionId: "lobby.bot.bravo.description",
     },
+    {
+      id: "kayo",
+      name: "Kayo",
+      title: "Arakni's successor",
+      heroName: "Kayo, Armed and Dangerous",
+      deckType: "midrange",
+      descriptionId: "lobby.bot.kayo.description",
+    },
+    {
+      id: "iyslander",
+      name: "Iyslander",
+      title: "Storm of Sand",
+      heroName: "Iyslander",
+      deckType: "elemental",
+      descriptionId: "lobby.bot.iyslander.description",
+    },
   ],
 };
 

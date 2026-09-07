@@ -5,6 +5,8 @@ export {
   halaPresentationFor,
   iraPresentation,
   jarlPresentationFor,
+  kayoPresentation,
+  iyslanderPresentation,
 } from "./sideboard.js";
 export { chooseBriarIntent, chooseBriarIntentWithTrace } from "./briar-policy.js";
 export type { BriarIntentDecision } from "./briar-policy.js";

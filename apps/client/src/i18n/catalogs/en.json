@@ -2391,6 +2391,8 @@
   "lobby.bot.jarl.description": "A patient Earth and Ice Guardian that blocks efficiently and attacks with disruptive two-card hands.",
   "lobby.bot.briar.description": "An aggressive deck that chains elemental attacks together.",
   "lobby.bot.bravo.description": "A defensive deck that sets up powerful, disruptive attacks.",
+  "lobby.bot.kayo.description": "A straightforward brute deck that turns big attacks into pressure.",
+  "lobby.bot.iyslander.description": "An elemental wizard deck that controls the pace with arcane damage.",
   "account.title": "Account",
   "account.signedInAs": "Signed in as <strong>{username}</strong>.",
   "account.badge.title": "Player badge",
