@@ -4,6 +4,12 @@ dist/
 .DS_Store
 /.cache/card-image-checks/
 
+# Feltable local evidence. Raw player replays and rendered reports are not
+# product source and must not be published from the Fyendal fork.
+/json/
+/reports/
+/packages/cards/experiments/
+
 # production env (compose)
 .env
 .env.*
