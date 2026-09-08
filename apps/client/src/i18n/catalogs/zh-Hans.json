@@ -1126,6 +1126,7 @@
   "card.mpg.iron.card.discard": "Test of Iron Grip：弃置一张牌",
   "card.mpg.opposing.equipment.equip": "Annexation of the Forge：装备对方的装备",
   "card.sbl.charge.choose": "{card}：选择一张手牌进行充能，或拒绝",
+  "card.sbl.roaring.charge": "Roaring Beam：选择一张手牌进行充能",
   "card.sbl.halo.soul": "Halo of Illumination：将一张手牌置入你的英雄 soul",
   "card.sbl.sword.sharpen": "Edict of Steel：强化一把你操控的目标剑",
   "card.sbl.v.charge.first": "V of the Vanguard：选择一张手牌进行充能，或停止",

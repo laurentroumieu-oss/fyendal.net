@@ -10847,6 +10847,12 @@
       "value": "Halo of Illumination: put a card from your hand into your hero's soul"
     }
   ],
+  "card.sbl.roaring.charge": [
+    {
+      "type": 0,
+      "value": "Roaring Beam: choose a card from your hand to charge"
+    }
+  ],
   "card.sbl.sword.sharpen": [
     {
       "type": 0,

@@ -430,8 +430,18 @@ export const sbl: Record<string, CardScript> = {
     onPlay(ctx) {
       ctx.createToken(COURAGE);
       if (ctx.player(ctx.seat).soul.length === 0 && ctx.returnSelfToHand()) {
-        ctx.charge(ctx.self.instanceId);
+        const hand = ctx.player(ctx.seat).hand;
+        if (hand.length) {
+          ctx.requestCardChoice(
+            "roaring-beam-charge",
+            decisionPrompt("Roaring Beam: choose a card from your hand to charge", "card.sbl.roaring.charge"),
+            hand.map((card) => card.instanceId),
+          );
+        }
       }
+    },
+    onChoose(ctx, hook, option) {
+      if (hook === "roaring-beam-charge") ctx.charge(Number(option));
     },
   },
 
