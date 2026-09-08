@@ -10361,6 +10361,12 @@
       "value": "Halo of Illumination：将一张手牌置入你的英雄 soul"
     }
   ],
+  "card.sbl.roaring.charge": [
+    {
+      "type": 0,
+      "value": "Roaring Beam：选择一张手牌进行充能"
+    }
+  ],
   "card.sbl.sword.sharpen": [
     {
       "type": 0,
@@ -20838,10 +20844,22 @@
       "value": "直观易懂的 Armory 牌组，非常适合新手。"
     }
   ],
+  "lobby.bot.iyslander.description": [
+    {
+      "type": 0,
+      "value": "通过奥术伤害控制节奏的元素法师牌组。"
+    }
+  ],
   "lobby.bot.jarl.description": [
     {
       "type": 0,
       "value": "耐心的土冰守护者，擅长高效防御并用两卡手牌发动干扰性攻击。"
+    }
+  ],
+  "lobby.bot.kayo.description": [
+    {
+      "type": 0,
+      "value": "直截了当的蛮力牌组，用大型攻击持续施压。"
     }
   ],
   "lobby.bot.prompt": [

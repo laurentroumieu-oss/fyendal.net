@@ -24,6 +24,7 @@ export function executeBotPolicyTask(
     legal: legalIntents(state, task.seat),
     cards: cardData,
     state,
+    difficulty: task.difficulty,
   };
   const decision = definition.chooseDecision(input);
   return { decision, computeMs: performance.now() - startedAt };

@@ -10847,6 +10847,12 @@
       "value": "Halo of Illumination: put a card from your hand into your hero's soul"
     }
   ],
+  "card.sbl.roaring.charge": [
+    {
+      "type": 0,
+      "value": "Roaring Beam: choose a card from your hand to charge"
+    }
+  ],
   "card.sbl.sword.sharpen": [
     {
       "type": 0,
@@ -21634,10 +21640,22 @@
       "value": "A straightforward Armory Deck that's great for beginners."
     }
   ],
+  "lobby.bot.iyslander.description": [
+    {
+      "type": 0,
+      "value": "An elemental wizard deck that controls the pace with arcane damage."
+    }
+  ],
   "lobby.bot.jarl.description": [
     {
       "type": 0,
       "value": "A patient Earth and Ice Guardian that blocks efficiently and attacks with disruptive two-card hands."
+    }
+  ],
+  "lobby.bot.kayo.description": [
+    {
+      "type": 0,
+      "value": "A straightforward brute deck that turns big attacks into pressure."
     }
   ],
   "lobby.bot.prompt": [

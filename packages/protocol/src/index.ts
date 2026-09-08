@@ -177,7 +177,7 @@ const FORMATS = new Set(["classic-battles", "cc", "silver-age"]);
 const HEROES = new Set(["dorinthea", "rhinar"]);
 const PHASES = new Set(["start", "action", "layer", "reaction", "defend", "end", "game-over"]);
 const MELD_SIDES = new Set(["left", "right", "both"]);
-const BOT_OPPONENTS = new Set(["bravo", "briar", "cindra", "ira", "hala", "jarl"]);
+const BOT_OPPONENTS = new Set(["bravo", "briar", "kayo", "iyslander", "cindra", "ira", "hala", "jarl"]);
 const PLAYABLE_ZONES = new Set(["banish", "graveyard", "deck"]);
 const EQUIPMENT_SLOTS = new Set(["head", "chest", "arms", "legs"]);
 const DECISION_KINDS = new Set([
@@ -510,10 +510,11 @@ export function decodeClientMessage(value: unknown): ClientMessage | null {
         ));
       break;
     case "create-bot-room":
-      valid = exactKeys(message, ["type", "format", "deckId", "bot", "allowFutureCards"], ["type", "deckId"])
+      valid = exactKeys(message, ["type", "format", "deckId", "bot", "difficulty", "allowFutureCards"], ["type", "deckId"])
         && (message.format === undefined || message.format === "cc" || message.format === "silver-age")
         && id(message.deckId)
         && (message.bot === undefined || BOT_OPPONENTS.has(String(message.bot)))
+        && (message.difficulty === undefined || ["training", "balanced", "tactical", "champion"].includes(String(message.difficulty)))
         && (message.allowFutureCards === undefined || typeof message.allowFutureCards === "boolean");
       break;
     case "join-room":

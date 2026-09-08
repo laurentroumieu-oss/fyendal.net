@@ -427,6 +427,11 @@ export const MIGRATIONS: Migration[] = [
     CREATE INDEX bug_reports_reporter_notification_idx
       ON bug_reports (reporter_user_id, dismissed_at, fixed_at);`,
   },
+  {
+    version: 25,
+    sql: `ALTER TABLE room_seats ADD COLUMN bot_difficulty TEXT NOT NULL DEFAULT 'balanced'
+      CHECK (bot_difficulty IN ('training', 'balanced', 'tactical', 'champion'));`,
+  },
 ];
 
 async function publicTables(db: Queryable): Promise<string[]> {
@@ -480,6 +485,9 @@ export async function applyMigrations(db: Queryable, migrations: Migration[]): P
 }
 
 export function defaultConnectionString(): string {
+  if (process.env.FYENDAL_DEV_MEMORY_DB === "1" && process.env.NODE_ENV !== "production") {
+    return "pgmem://local";
+  }
   return process.env.DATABASE_URL ?? "postgres://fyendal:fyendal@localhost:5432/fyendal";
 }
 
@@ -500,6 +508,10 @@ export async function applyMigrationsLocked(pool: Pool, migrations: Migration[])
 }
 
 export async function createPool(connectionString: string = defaultConnectionString()): Promise<Pool> {
+  if (connectionString.startsWith("pgmem://")) {
+    const { createDevMemoryPool } = await import("./devMemoryDb.js");
+    return await createDevMemoryPool() as unknown as Pool;
+  }
   const configuredMax = Number(process.env.DB_POOL_MAX ?? 10);
   const max = Number.isSafeInteger(configuredMax) && configuredMax >= 1 && configuredMax <= 100
     ? configuredMax

@@ -484,7 +484,7 @@ export function createGameServer(port: number, deps: ServerDeps): http.Server {
           deckName: choice.choice.deckName,
           username: ctx.user.username,
           userId: ctx.user.id,
-        }, msg.allowFutureCards === true, botOpponent);
+        }, msg.allowFutureCards === true, botOpponent, msg.difficulty ?? "balanced");
         connections.attach(ctx, code, seat, token);
         const version = await markAttachedPresent(ctx);
         send(ws, { type: "room-created", code, seat, token, version });
@@ -1005,7 +1005,7 @@ export function createGameServer(port: number, deps: ServerDeps): http.Server {
   // Establish the event-log tail before accepting clients. Events committed
   // after this snapshot are consumed; older state is loaded on reconnect.
   void clusterConsumer.startAtTail()
-    .then(() => server.listen(port))
+    .then(() => server.listen(port, host))
     .catch((error) => server.emit("error", error));
 
   if (!process.env.VITEST) {
@@ -1099,6 +1099,7 @@ function requirePlayer(
 }
 
 const port = Number(process.env.PORT ?? 8080);
+const host = process.env.HOST ?? "127.0.0.1";
 /** How often expired rooms (game over / both players disconnected) are deleted. */
 const SWEEP_INTERVAL_MS = 60_000;
 const MATCH_PREP_SWEEP_INTERVAL_MS = 5_000;

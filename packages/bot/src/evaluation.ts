@@ -2,6 +2,7 @@ import { cardData, precon, scripts } from "@fyendal/cards";
 import { applyIntent, createGame, legalIntents, projectStateFor } from "@fyendal/engine";
 import type { Decklist, GameIntent } from "@fyendal/shared";
 import { botDefinition, type BotDefinition } from "./registry.js";
+import type { BotDifficultyId } from "./difficulty.js";
 
 export interface BotMatchEvaluation {
   bots: [string, string];
@@ -12,6 +13,14 @@ export interface BotMatchEvaluation {
   decisions: [number, number];
   totalDecisionMs: [number, number];
   maxDecisionMs: [number, number];
+  finalLife: [number, number];
+  finalDeckSizes: [number, number];
+  minimumDeckSizes: [number, number];
+  zeroDeckReached: [boolean, boolean];
+  uniqueStateCount: number;
+  repeatedStateCount: number;
+  consecutiveStateRepeats: number;
+  maxConsecutiveStateRepeats: number;
   actionDigest: string;
   complete: boolean;
 }
@@ -21,6 +30,8 @@ export interface BotMatchEvaluationOptions {
   right: string;
   seed: number;
   maxSteps?: number;
+  /** Optional player-facing computation profile for each seat. */
+  difficulty?: [BotDifficultyId, BotDifficultyId];
   /** Injectable monotonic clock keeps harness tests deterministic. */
   now?: () => number;
 }
@@ -55,6 +66,29 @@ function digestIntents(intents: readonly GameIntent[]): string {
   return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
+function stateFingerprint(state: ReturnType<typeof createGame>): string {
+  return JSON.stringify({
+    turn: state.turn,
+    phase: state.phase,
+    priorityPlayer: state.priorityPlayer,
+    pending: state.pendingDecision
+      ? { player: state.pendingDecision.player, kind: state.pendingDecision.kind, chooseHook: state.pendingDecision.chooseHook }
+      : null,
+    players: state.players.map((player) => ({
+      life: player.life,
+      deck: player.deck.map((card) => card.instanceId),
+      hand: player.hand.map((card) => card.instanceId),
+      arsenal: player.arsenal.map((card) => card.instanceId),
+      pitch: player.pitch.map((card) => card.instanceId),
+      graveyard: player.graveyard.map((card) => card.instanceId),
+      banish: player.banish.map((card) => card.instanceId),
+      board: player.board.map((card) => card.instanceId),
+      resources: player.resources,
+      actionPoints: player.actionPoints,
+    })),
+  });
+}
+
 /** Deterministic bot-vs-bot strength harness. It runs both policies through
  * authoritative legal intents and reports outcome, decision count, and
  * latency without changing production game flow. */
@@ -79,8 +113,32 @@ export function evaluateBotMatch(options: BotMatchEvaluationOptions): BotMatchEv
   const intents: GameIntent[] = [];
   const now = options.now ?? (() => performance.now());
   const maxSteps = options.maxSteps ?? 2_000;
+  const minimumDeckSizes: [number, number] = [
+    state.players[0]?.deck.length ?? 0,
+    state.players[1]?.deck.length ?? 0,
+  ];
+  const seenStates = new Set<string>();
+  let repeatedStateCount = 0;
+  let consecutiveStateRepeats = 0;
+  let maxConsecutiveStateRepeats = 0;
+  let previousFingerprint: string | undefined;
   let steps = 0;
   for (; steps < maxSteps && state.winner === null; steps++) {
+    const fingerprint = stateFingerprint(state);
+    if (seenStates.has(fingerprint)) repeatedStateCount++;
+    if (fingerprint === previousFingerprint) {
+      consecutiveStateRepeats++;
+      maxConsecutiveStateRepeats = Math.max(maxConsecutiveStateRepeats, consecutiveStateRepeats);
+    } else {
+      consecutiveStateRepeats = 0;
+    }
+    previousFingerprint = fingerprint;
+    seenStates.add(fingerprint);
+    for (const player of state.players) {
+      if (player.seat === 0 || player.seat === 1) {
+        minimumDeckSizes[player.seat] = Math.min(minimumDeckSizes[player.seat] ?? player.deck.length, player.deck.length);
+      }
+    }
     const actor = (state.pendingDecision?.player ?? state.priorityPlayer) as 0 | 1;
     const legal = legalIntents(state, actor).filter((intent) => intent.kind !== "concede");
     if (legal.length === 0) throw new Error(`bot ${definitions[actor].id} has no legal intent`);
@@ -91,6 +149,7 @@ export function evaluateBotMatch(options: BotMatchEvaluationOptions): BotMatchEv
       legal,
       cards: cardData,
       state,
+      difficulty: options.difficulty?.[actor],
     });
     const elapsed = Math.max(0, now() - startedAt);
     decisions[actor]++;
@@ -110,6 +169,23 @@ export function evaluateBotMatch(options: BotMatchEvaluationOptions): BotMatchEv
     decisions,
     totalDecisionMs,
     maxDecisionMs,
+    finalLife: [
+      state.players[0]?.life ?? 0,
+      state.players[1]?.life ?? 0,
+    ],
+    finalDeckSizes: [
+      state.players[0]?.deck.length ?? 0,
+      state.players[1]?.deck.length ?? 0,
+    ],
+    minimumDeckSizes,
+    zeroDeckReached: [
+      minimumDeckSizes[0] === 0,
+      minimumDeckSizes[1] === 0,
+    ],
+    uniqueStateCount: seenStates.size,
+    repeatedStateCount,
+    consecutiveStateRepeats,
+    maxConsecutiveStateRepeats,
     actionDigest: digestIntents(intents),
     complete: state.winner !== null,
   };

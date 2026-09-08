@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import {
   IDLE_VICTORY_MS,
+  type BotDifficulty,
   type BotOpponent,
   type Decklist,
   type EquipmentSlot,
@@ -72,6 +73,8 @@ export interface SeatRow {
   tokenHash: string;
   /** Bot seats have no socket or account and are driven after room commits. */
   controller?: "bot";
+  /** Bot-only player-facing computation profile. */
+  botDifficulty?: BotDifficulty;
   /** classic-battles player seats: which preconstructed hero */
   hero?: HeroId;
   /** cc/silver-age player seats: the saved deck this seat plays with */
@@ -581,6 +584,10 @@ function decodeSeatRows(values: unknown[], code: string): [SeatRow | null, SeatR
     if (!(row.controller === "human" || row.controller === "bot")) {
       throw new CorruptRoomError(code, `seats[${index}].controller`, "expected human or bot");
     }
+    if (!(row.bot_difficulty === "training" || row.bot_difficulty === "balanced" ||
+      row.bot_difficulty === "tactical" || row.bot_difficulty === "champion")) {
+      throw new CorruptRoomError(code, `seats[${index}].bot_difficulty`, "expected a known bot difficulty");
+    }
     if (!(row.priority_mode === "always-pause" || row.priority_mode === "auto-pass")) {
       throw new CorruptRoomError(code, `seats[${index}].priority_mode`, "expected always-pause or auto-pass");
     }
@@ -599,6 +606,7 @@ function decodeSeatRows(values: unknown[], code: string): [SeatRow | null, SeatR
     seats[seat] = {
       tokenHash: row.token_hash,
       ...(row.controller === "bot" ? { controller: "bot" as const } : {}),
+      ...(row.bot_difficulty !== "balanced" ? { botDifficulty: row.bot_difficulty as BotDifficulty } : {}),
       ...(row.hero === "rhinar" || row.hero === "dorinthea" ? { hero: row.hero } : {}),
       ...(typeof row.deck_id === "string" ? { deckId: row.deck_id } : {}),
       ...(typeof row.deck_name === "string" ? { deckName: row.deck_name } : {}),
@@ -866,6 +874,7 @@ export class PgRoomStore {
       member.priorityMode ?? "always-pause",
       member.runechantSkip ?? false,
       member.accepted ?? false,
+      member.botDifficulty ?? "balanced",
     ];
   }
 
@@ -905,8 +914,8 @@ export class PgRoomStore {
         ? await db.query(
             `INSERT INTO room_seats
               (room_code, seat, user_id, token_hash, username, hero, hero_id, deck_id, deck_name,
-               from_queue, ready, presented, last_action_at, controller, priority_mode, runechant_skip, accepted)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+               from_queue, ready, presented, last_action_at, controller, priority_mode, runechant_skip, accepted, bot_difficulty)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
             values,
           )
         : await db.query(
@@ -925,7 +934,8 @@ export class PgRoomStore {
                controller = $14,
                priority_mode = $15,
                runechant_skip = $16,
-               accepted = $17
+               accepted = $17,
+               bot_difficulty = $18
              WHERE room_code = $1 AND seat = $2`,
             values,
           );
@@ -1341,6 +1351,7 @@ export class PgRoomStore {
     },
     allowFutureCards = false,
     bot: BotOpponent = format === "cc" ? "hala" : "briar",
+    botDifficulty: BotDifficulty = "balanced",
   ): Promise<{ code: string; seat: number; token: string; version: number }> {
     const definition = botDefinition(bot);
     if (!definition || definition.format !== format) {
@@ -1353,6 +1364,7 @@ export class PgRoomStore {
       deckName: definition.deckName,
       username: definition.username,
       controller: "bot",
+      botDifficulty,
     });
     if (!joined.ok || joined.kind !== "player") {
       throw new Error(`could not seat ${definition.username}: ${joined.ok ? "unexpected spectator" : joined.error}`);
@@ -1729,6 +1741,7 @@ export class PgRoomStore {
       userId?: number;
       fromQueue?: boolean;
       controller?: "bot";
+      botDifficulty?: BotDifficulty;
       /** force a spectator slot even when a player seat is free */
       spectate?: boolean;
     },
@@ -1856,6 +1869,7 @@ export class PgRoomStore {
           heroId: deck.decklist.heroId,
           fromQueue: opts.fromQueue,
           controller: opts.controller,
+          botDifficulty: opts.botDifficulty,
           lastSeenAt: 0,
         };
       }

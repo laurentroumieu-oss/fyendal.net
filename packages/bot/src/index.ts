@@ -5,6 +5,8 @@ export {
   halaPresentationFor,
   iraPresentation,
   jarlPresentationFor,
+  kayoPresentation,
+  iyslanderPresentation,
 } from "./sideboard.js";
 export { chooseBriarIntent, chooseBriarIntentWithTrace } from "./briar-policy.js";
 export type { BriarIntentDecision } from "./briar-policy.js";
@@ -30,8 +32,32 @@ export {
 export type { CindraIntentDecision } from "./cindra-policy.js";
 export { botObservationKey, isCleanActionDecision } from "./turn-planner.js";
 export type { TurnPlanCheckpoint, TurnPlannerCandidateTrace } from "./turn-planner.js";
+export {
+  BOT_SCENARIOS,
+  buildBotBenchmarkReport,
+  evaluateBotScenario,
+  evaluateBotScenarioCorpus,
+} from "./scenario-corpus.js";
+export type {
+  BotScenarioCategory,
+  BotScenarioDefinition,
+  BotScenarioResult,
+  BotBenchmarkReport,
+} from "./scenario-corpus.js";
+export { evaluateBotMatch } from "./evaluation.js";
+export type { BotMatchEvaluation, BotMatchEvaluationOptions } from "./evaluation.js";
 export { chooseHalaIntent, chooseHalaIntentWithTrace } from "./hala-policy.js";
 export type { HalaIntentDecision, HalaTurnEvaluation, HalaTurnPlan } from "./hala-policy.js";
+export {
+  BOT_DIFFICULTY_PROFILES,
+  botDifficultyProfile,
+  plannerBudget,
+} from "./difficulty.js";
+export type {
+  BotDifficultyId,
+  BotDifficultyProfile,
+  BotPlannerBudget,
+} from "./difficulty.js";
 export { chooseIraIntent, chooseIraIntentWithTrace } from "./ira-policy.js";
 export type { IraIntentDecision, IraTurnEvaluation, IraTurnPlan } from "./ira-policy.js";
 export { chooseJarlIntent, chooseJarlIntentWithTrace } from "./jarl-policy.js";

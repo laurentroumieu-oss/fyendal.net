@@ -383,7 +383,7 @@ describe("client messages", () => {
   it("rejects unknown fields, unsafe integers, oversized data, bad nesting, and non-literal Boost", () => {
     expect(decodeClientMessage({ type: "list-rooms", extra: true })).toBeNull();
     expect(decodeClientMessage({ type: "create-bot-room", format: "classic-battles", deckId: "precon-asr" })).toBeNull();
-    expect(decodeClientMessage({ type: "create-bot-room", format: "cc", deckId: "precon-asr", bot: "kayo" })).toBeNull();
+    expect(decodeClientMessage({ type: "create-bot-room", format: "cc", deckId: "precon-asr", bot: "not-a-bot" })).toBeNull();
     expect(decodeClientMessage({ type: "auth", token: "x".repeat(129) })).toBeNull();
     expect(decodeClientMessage({ type: "intent", intent: { kind: "choose", optionId: "x".repeat(257) } })).toBeNull();
     expect(decodeClientMessage({ type: "intent", intent: { kind: "play-card", instanceId: Number.MAX_SAFE_INTEGER + 1, pitchInstanceIds: [] } })).toBeNull();

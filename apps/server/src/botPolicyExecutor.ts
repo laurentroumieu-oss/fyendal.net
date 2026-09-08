@@ -1,6 +1,6 @@
 import { Worker } from "node:worker_threads";
 import type { BotDecision } from "@fyendal/bot";
-import type { BotOpponent } from "@fyendal/shared";
+import type { BotDifficulty, BotOpponent } from "@fyendal/shared";
 import type { PersistedStateV1 } from "./persistedState.js";
 import {
   decodeBotPolicyWorkerResponse,
@@ -37,6 +37,7 @@ export interface BotPolicyRequest {
   version: number;
   rulesetVersion: string;
   botId: BotOpponent;
+  difficulty?: BotDifficulty;
   seat: 0 | 1;
   state: PersistedStateV1;
 }

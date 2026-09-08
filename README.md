@@ -51,6 +51,21 @@ Start the server and client development processes:
 pnpm dev
 ```
 
+For local UI, deck-import, and bot smoke testing without PostgreSQL, use the
+ephemeral in-memory database instead:
+
+```sh
+pnpm dev:memory
+```
+
+In a second terminal, keep the client running with `pnpm --filter
+@fyendal/client dev` and open <http://localhost:5173>. The memory server listens
+on `ws://localhost:8080` and `http://localhost:8080` for the client API.
+
+This mode resets its data whenever the server restarts and is disabled when
+`NODE_ENV=production`; normal development and production continue to use
+PostgreSQL.
+
 Open <http://localhost:5173>. The API and WebSocket server listens on port
 `8080`. Create a username/password account to play; spectators may join through
 a room link without an account. Fyendal does not collect email addresses or

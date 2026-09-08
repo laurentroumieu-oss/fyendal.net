@@ -11,6 +11,7 @@
     "build": "pnpm clean && tsc -p tsconfig.build.json && esbuild src/index.ts src/botPolicyWorker.ts --bundle --platform=node --target=node24 --format=esm --outdir=dist --external:pg --external:ws",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "dev": "APP_ORIGIN=${APP_ORIGIN:-http://localhost:5173} RULESET_VERSION=${RULESET_VERSION:-development-seed} WS_MAX_PER_IP=100 tsx watch src/index.ts",
+    "dev:memory": "FYENDAL_DEV_MEMORY_DB=1 HOST=127.0.0.1 APP_ORIGIN=http://localhost:5173 RULESET_VERSION=development-seed node --import tsx src/index.ts",
     "seed": "tsx src/seed.ts",
     "activate-ruleset": "tsx src/activateRuleset.ts",
     "start": "node dist/index.js",

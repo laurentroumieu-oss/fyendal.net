@@ -1,6 +1,7 @@
 import { applyIntent, legalIntents, projectStateFor, type GameState } from "@fyendal/engine";
 import type { CardView, GameIntent } from "@fyendal/shared";
 import { strategicPitchIntents, type BotPolicyInput } from "./policy.js";
+import { plannerBudget } from "./difficulty.js";
 
 export const DEFAULT_MAX_SEARCH_NODES = 64;
 export const DEFAULT_MAX_SEARCH_TRANSITIONS = 512;
@@ -602,6 +603,15 @@ export function planTurn<Evaluation extends TurnEvaluation>(
   config: TurnPlannerConfig<Evaluation>,
 ): TurnPlan<Evaluation> | undefined {
   if (!input.state || !isCleanActionDecision(input.state, input.seat)) return undefined;
+  const budget = plannerBudget({
+    maxSearchNodes: config.maxSearchNodes ?? DEFAULT_MAX_SEARCH_NODES,
+    maxTransitions: config.maxTransitions ?? DEFAULT_MAX_SEARCH_TRANSITIONS,
+    maxRootCandidates: config.maxRootCandidates ?? MAX_ROOT_CANDIDATES,
+  }, input.difficulty);
+  const plannerConfig = {
+    ...config,
+    ...budget,
+  };
   const simulation = cloneForSimulation(input.state, input.view.gameId);
   const me = input.view.players[input.seat];
   const deck = simulation.players[input.seat].deck;
@@ -626,7 +636,7 @@ export function planTurn<Evaluation extends TurnEvaluation>(
   };
   const context: SearchContext<Evaluation> = {
     root,
-    config,
+    config: plannerConfig,
     nodes: 0,
     nodeLimit: config.maxSearchNodes ?? DEFAULT_MAX_SEARCH_NODES,
     transitions: 0,
@@ -645,9 +655,9 @@ export function planTurn<Evaluation extends TurnEvaluation>(
   };
   const rootCandidates = plannerCandidates(input, context, 0);
   if (rootCandidates.length === 0) return undefined;
-  const totalBudget = config.maxSearchNodes ?? DEFAULT_MAX_SEARCH_NODES;
-  const totalTransitionBudget = config.maxTransitions ?? DEFAULT_MAX_SEARCH_TRANSITIONS;
-  const rootObservationKey = config.recordCheckpoints ? botObservationKey(input) : undefined;
+  const totalBudget = plannerConfig.maxSearchNodes;
+  const totalTransitionBudget = plannerConfig.maxTransitions;
+  const rootObservationKey = plannerConfig.recordCheckpoints ? botObservationKey(input) : undefined;
   let best: SearchResult<Evaluation> | undefined;
   for (const [index, intent] of rootCandidates.entries()) {
     if (context.nodes >= totalBudget || context.transitions >= totalTransitionBudget) break;

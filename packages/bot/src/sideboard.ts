@@ -1,4 +1,4 @@
-import { cardData, precon } from "@fyendal/cards";
+import { cardData, equipmentFitsSlot, precon } from "@fyendal/cards";
 import type { CardData, Decklist, EquipmentSlot, PresentedDeck } from "@fyendal/shared";
 import { briarMatchupForHeroName } from "./briar-strategy.js";
 
@@ -8,6 +8,8 @@ const CINDRA_BOT_DECK_ID = "bot-cindra-head-jabs";
 const HALA_MASTERCLASS_PRECON_ID = "precon-hala-masterclass";
 const IRA_PRECON_ID = "precon-asr";
 const JARL_BOT_DECK_ID = "bot-jarl";
+const KAYO_BOT_DECK_ID = "precon-ska";
+const IYSLANDER_BOT_DECK_ID = "precon-siy";
 
 const BRAVO_ARCANE_POLARITY = ["SBA030", "SBA030"];
 const BRAVO_RED_CHOKESLAM = ["SBR016", "SBR016"];
@@ -572,4 +574,42 @@ export function iraPresentation(): PresentedDeck {
     equipment: { head, chest, arms, legs },
     deck: [...registered.pool.deck],
   };
+}
+
+function fixedSilverAgePreconPresentation(deckId: string): PresentedDeck {
+  const registered = precon(deckId);
+  if (!registered || registered.format !== "silver-age") {
+    throw new Error(`${deckId} is not registered as a Silver Age precon`);
+  }
+  const [weapon] = registered.pool.weaponIds;
+  const usedEquipment = new Set<string>();
+  const equipment = (slot: EquipmentSlot): string | undefined => {
+    const id = registered.pool.equipmentPool.find((candidate) =>
+      !usedEquipment.has(candidate) && equipmentFitsSlot(cardData[candidate], slot));
+    if (id) usedEquipment.add(id);
+    return id;
+  };
+  const head = equipment("head");
+  const chest = equipment("chest");
+  const arms = equipment("arms");
+  const legs = equipment("legs");
+  if (!weapon || !head || !chest || !arms || !legs) {
+    throw new Error(`${deckId} does not have a complete fixed presentation`);
+  }
+  return {
+    weaponIds: [weapon],
+    equipment: { head, chest, arms, legs },
+    // Silver Age requires exactly 40 cards in the presented main deck. The
+    // published precon pool contains extra legal cards; keep the deterministic
+    // first forty for this fixed practice presentation.
+    deck: registered.pool.deck.slice(0, 40),
+  };
+}
+
+export function kayoPresentation(): PresentedDeck {
+  return fixedSilverAgePreconPresentation(KAYO_BOT_DECK_ID);
+}
+
+export function iyslanderPresentation(): PresentedDeck {
+  return fixedSilverAgePreconPresentation(IYSLANDER_BOT_DECK_ID);
 }
