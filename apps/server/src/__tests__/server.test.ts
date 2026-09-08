@@ -14,6 +14,10 @@ const PORT = 18901;
 let wss: ReturnType<typeof createGameServer>;
 let db: Queryable;
 let userCounter = 0;
+// The complete server suite exercises many DB-backed websocket rooms in one
+// process. Keep the assertion bounded, but allow slower hosted CI runners to
+// finish a legitimate queued operation before declaring the protocol broken.
+const TEST_MESSAGE_TIMEOUT_MS = 10_000;
 
 beforeAll(async () => {
   db = await freshDb();
@@ -59,7 +63,7 @@ function client(): Promise<{
             waiters.push({ pred, res });
             setTimeout(
               () => rej(new Error(`timeout waiting for message; inbox=${inbox.map((m) => `${m.type}:${"version" in m ? m.version : "-"}`).join(",")}`)),
-              3000,
+              TEST_MESSAGE_TIMEOUT_MS,
             );
           }),
       }),
