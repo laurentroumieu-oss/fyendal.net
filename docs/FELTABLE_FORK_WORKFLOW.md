@@ -16,6 +16,11 @@ The initial `feltable-integration` branch is a migration boundary while the
 existing local commits are reviewed and pushed. Once accepted, merge it into
 the fork's protected `main`; do not retain it as a permanent parallel trunk.
 
+GitHub Actions runs the full `release-check` job on pull requests targeting
+`main`. Branch protection must require that check before merge; the initial
+integration PR was the one-time bootstrap exception because inherited fork
+workflows are not registered until they exist on the fork's default branch.
+
 ## Upstream update procedure
 
 1. Ensure the worktree is clean and fetch `upstream`.
